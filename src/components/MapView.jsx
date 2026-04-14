@@ -1,4 +1,5 @@
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { useEffect } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import { Link } from 'react-router-dom';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -15,24 +16,36 @@ const defaultIcon = L.icon({
 
 L.Marker.prototype.options.icon = defaultIcon;
 
+function InvalidateSize() {
+  const map = useMap();
+  useEffect(() => {
+    setTimeout(() => {
+      map.invalidateSize();
+    }, 200);
+  }, [map]);
+  return null;
+}
+
 export default function MapView({ entries }) {
   const entriesWithLocation = entries.filter((e) => e.latitude && e.longitude);
 
   const center =
     entriesWithLocation.length > 0
       ? [entriesWithLocation[0].latitude, entriesWithLocation[0].longitude]
-      : [51.505, -0.09];
+      : [30.0, 104.0];
 
   return (
     <MapContainer
       center={center}
       zoom={entriesWithLocation.length > 0 ? 10 : 3}
-      className="w-full h-full rounded-lg"
-      style={{ minHeight: '100%' }}
+      className="w-full h-full"
+      style={{ height: '100%', width: '100%' }}
+      scrollWheelZoom={true}
     >
+      <InvalidateSize />
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       {entriesWithLocation.map((entry) => (
         <Marker key={entry.id} position={[entry.latitude, entry.longitude]}>
@@ -46,6 +59,9 @@ export default function MapView({ entries }) {
                 />
               )}
               <p className="font-semibold text-sm">{entry.title}</p>
+              {entry.placeName && (
+                <p className="text-xs text-gray-500 mb-1">{entry.placeName}</p>
+              )}
               <Link to={`/entry/${entry.id}`} className="text-xs text-blue-600">
                 View Details →
               </Link>
