@@ -2,11 +2,18 @@ import { useState, useRef, useCallback } from 'react';
 
 export function useCamera() {
   const [photo, setPhoto] = useState(null);
-  const [stream, setStream] = useState(null);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [error, setError] = useState(null);
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
+  const streamRef = useRef(null);
+
+  const stopStream = useCallback(() => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+    }
+  }, []);
 
   const openCamera = useCallback(async () => {
     try {
@@ -14,11 +21,15 @@ export function useCamera() {
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } },
       });
-      setStream(mediaStream);
+      streamRef.current = mediaStream;
       setIsCameraOpen(true);
-      if (videoRef.current) {
-        videoRef.current.srcObject = mediaStream;
-      }
+      // Wait for next render to set srcObject
+      setTimeout(() => {
+        if (videoRef.current) {
+          videoRef.current.srcObject = mediaStream;
+          videoRef.current.play().catch(() => {});
+        }
+      }, 50);
     } catch (err) {
       setError(`Camera access denied: ${err.message}`);
       setIsCameraOpen(false);
@@ -30,24 +41,29 @@ export function useCamera() {
 
     const video = videoRef.current;
     const canvas = canvasRef.current;
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
+
+    // Ensure video has valid dimensions
+    const w = video.videoWidth || video.clientWidth || 640;
+    const h = video.videoHeight || video.clientHeight || 480;
+
+    canvas.width = w;
+    canvas.height = h;
 
     const ctx = canvas.getContext('2d');
-    ctx.drawImage(video, 0, 0);
+    ctx.drawImage(video, 0, 0, w, h);
 
     const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
     setPhoto(dataUrl);
-    closeCamera();
-  }, []);
+
+    // Stop stream directly via ref
+    stopStream();
+    setIsCameraOpen(false);
+  }, [stopStream]);
 
   const closeCamera = useCallback(() => {
-    if (stream) {
-      stream.getTracks().forEach((track) => track.stop());
-      setStream(null);
-    }
+    stopStream();
     setIsCameraOpen(false);
-  }, [stream]);
+  }, [stopStream]);
 
   const clearPhoto = useCallback(() => {
     setPhoto(null);

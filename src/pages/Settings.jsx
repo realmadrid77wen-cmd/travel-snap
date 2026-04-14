@@ -29,15 +29,19 @@ export default function Settings() {
             </div>
           </div>
           <button
+            type="button"
             onClick={toggleTheme}
-            className={`relative w-12 h-7 rounded-full transition-colors ${
+            role="switch"
+            aria-checked={isDark}
+            className={`relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full transition-colors duration-200 ease-in-out ${
               isDark ? 'bg-blue-600' : 'bg-gray-300'
             }`}
           >
             <span
-              className={`absolute top-0.5 w-6 h-6 bg-white rounded-full shadow transition-transform ${
-                isDark ? 'translate-x-5' : 'translate-x-0.5'
+              className={`pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow ring-0 transition-transform duration-200 ease-in-out ${
+                isDark ? 'translate-x-[22px]' : 'translate-x-[2px]'
               }`}
+              style={{ marginTop: '2px' }}
             />
           </button>
         </div>

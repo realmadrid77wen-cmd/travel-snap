@@ -12,11 +12,18 @@ export default function LocationPicker({ location, loading, error, onGetLocation
         <div className={`flex items-center justify-between rounded-lg px-4 py-3 ${
           isDark ? 'bg-green-900/30 border border-green-800' : 'bg-green-50 border border-green-200'
         }`}>
-          <div className="flex items-center gap-2">
-            <MapPin className="w-5 h-5 text-green-600" />
-            <span className={`text-sm ${isDark ? 'text-green-400' : 'text-green-800'}`}>
-              {location.latitude.toFixed(5)}, {location.longitude.toFixed(5)}
-            </span>
+          <div className="flex items-center gap-2 min-w-0">
+            <MapPin className="w-5 h-5 text-green-600 shrink-0" />
+            <div className="min-w-0">
+              <span className={`text-sm block truncate ${isDark ? 'text-green-400' : 'text-green-800'}`}>
+                {location.placeName || `${location.latitude.toFixed(5)}, ${location.longitude.toFixed(5)}`}
+              </span>
+              {location.placeName && (
+                <span className={`text-xs block ${isDark ? 'text-green-600' : 'text-green-600/60'}`}>
+                  {location.latitude.toFixed(5)}, {location.longitude.toFixed(5)}
+                </span>
+              )}
+            </div>
           </div>
           <button
             type="button"

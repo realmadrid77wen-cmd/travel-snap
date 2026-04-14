@@ -101,7 +101,7 @@ export default function ViewEntry() {
           {entry.latitude && entry.longitude && (
             <span className="flex items-center gap-1.5">
               <MapPin className="w-4 h-4" />
-              {entry.latitude.toFixed(5)}, {entry.longitude.toFixed(5)}
+              {entry.placeName || `${entry.latitude.toFixed(5)}, ${entry.longitude.toFixed(5)}`}
             </span>
           )}
         </div>

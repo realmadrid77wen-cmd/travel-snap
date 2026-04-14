@@ -3,7 +3,7 @@ import Dexie from 'dexie';
 export const db = new Dexie('TravelSnapDB');
 
 db.version(1).stores({
-  entries: '++id, title, description, date, latitude, longitude, photo, createdAt, updatedAt',
+  entries: '++id, title, description, date, latitude, longitude, placeName, photo, createdAt, updatedAt',
 });
 
 export async function createEntry(entry) {

@@ -93,6 +93,7 @@ export default function EditEntry() {
         date,
         latitude: effectiveLocation?.latitude || null,
         longitude: effectiveLocation?.longitude || null,
+        placeName: effectiveLocation?.placeName || null,
         photo: photo || null,
       });
       navigate(`/entry/${id}`);

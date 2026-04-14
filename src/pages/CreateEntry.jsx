@@ -49,6 +49,7 @@ export default function CreateEntry() {
         date,
         latitude: location?.latitude || null,
         longitude: location?.longitude || null,
+        placeName: location?.placeName || null,
         photo: photo || null,
       });
       navigate('/');

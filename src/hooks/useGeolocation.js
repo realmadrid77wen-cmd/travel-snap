@@ -1,5 +1,25 @@
 import { useState, useCallback } from 'react';
 
+async function reverseGeocode(lat, lon) {
+  try {
+    const res = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=14&addressdetails=1`,
+      { headers: { 'Accept-Language': 'en' } }
+    );
+    const data = await res.json();
+    if (data && data.address) {
+      const { city, town, village, county, state, country } = data.address;
+      const place = city || town || village || county || '';
+      const region = state || '';
+      const parts = [place, region, country].filter(Boolean);
+      return parts.join(', ');
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 export function useGeolocation() {
   const [location, setLocation] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -15,10 +35,14 @@ export function useGeolocation() {
     setError(null);
 
     navigator.geolocation.getCurrentPosition(
-      (position) => {
+      async (position) => {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        const placeName = await reverseGeocode(lat, lon);
         setLocation({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
+          latitude: lat,
+          longitude: lon,
+          placeName: placeName || `${lat.toFixed(4)}, ${lon.toFixed(4)}`,
         });
         setLoading(false);
       },

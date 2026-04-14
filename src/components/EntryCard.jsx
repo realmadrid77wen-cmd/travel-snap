@@ -55,9 +55,9 @@ export default function EntryCard({ entry }) {
             {formattedDate}
           </span>
           {entry.latitude && entry.longitude && (
-            <span className="flex items-center gap-1.5">
-              <MapPin className="w-3.5 h-3.5" />
-              {entry.latitude.toFixed(2)}, {entry.longitude.toFixed(2)}
+            <span className="flex items-center gap-1.5 truncate">
+              <MapPin className="w-3.5 h-3.5 shrink-0" />
+              {entry.placeName || `${entry.latitude.toFixed(2)}, ${entry.longitude.toFixed(2)}`}
             </span>
           )}
         </div>
